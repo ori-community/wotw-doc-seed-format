@@ -1,21 +1,18 @@
-# Archive Format
+# Container Format
 
-Not yet decided.
+Seeds are zip containers. Individual files may be compressed using zstd.
 
-The archive may contain assets provided by the plando/snippet author (mostly images), so it may become pretty large. The client should probably read the necessary files first and handle the rest asynchronously.
+# Seed Container Structure
 
-To support this, the archive should allow reading specific files efficiently, even if it becomes big (i.e. don't compress the entire thing).
-
-Compression is probably mostly relevant for the assembly because it's currently in JSON. With a more efficient assembly format compression might not be necessary.
-
-# Seed Archive Structure
+Files in [brackets] are optional
 
 ```
 ├── format_version.txt
 ├── preload.json
-├── seedgen_info.json
-├── seedgen_log.txt
-└── assembly.json
+├── assembly.json
+├── [seedgen_info.json]
+├── [seedgen_log.txt]
+└── [assets/*]
 ```
 
 ## format_version.txt
@@ -41,6 +38,14 @@ Contains necessary information while preloading in the main menu.
 }
 ```
 
+## assembly.json
+
+Consumer: Client
+
+Contains the compiled seedgen output that makes up the seed. Currently in JSON, although it's somewhat annoying to store assembly instructions in JSON. A binary format might be more pleasant to work with, maybe msgpack or a custom spec.
+
+See `Assembly` in [wotw_seedgen_seed](https://github.com/SiriusAshling/wotw-seedgen/blob/new_seed_format/wotw_seedgen_seed/src/assembly.rs) for the format
+
 ## seedgen_info.json
 
 Consumer: Seedgen
@@ -61,10 +66,8 @@ Consumer: Developer
 
 Contains the detailed log of the seed generation process for debugging purposes.
 
-## assembly.json
+## assets
 
 Consumer: Client
 
-Contains the compiled seedgen output that makes up the seed. Currently in JSON, although it's somewhat annoying to store assembly instructions in JSON. A binary format might be more pleasant to work with, maybe msgpack or a custom spec.
-
-See `SeedWorld` in [wotw_seedgen_assembly](https://github.com/SiriusAshling/wotw-seedgen/blob/seed_snippets_merge/wotw_seedgen_assembly/src/lib.rs) for the format
+The assembly may reference assets by path. These assets are contained at `assets/<path>`
